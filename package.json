@@ -1,0 +1,32 @@
+{
+  "name": "crop-disease-prediction-system",
+  "version": "1.0.0",
+  "description": "AI-powered web application for detecting crop diseases from leaf images",
+  "main": "api/index.py",
+  "scripts": {
+    "dev": "python backend/app.py",
+    "test": "pytest",
+    "deploy": "./deploy.sh",
+    "vercel-deploy": "vercel --prod",
+    "docker-build": "docker build -t crop-disease-ai .",
+    "docker-run": "docker run -p 5000:5000 crop-disease-ai",
+    "docker-compose": "docker-compose up --build",
+    "streamlit": "streamlit run streamlit_app.py"
+  },
+  "keywords": [
+    "ai",
+    "machine-learning",
+    "crop-disease",
+    "agriculture",
+    "flask",
+    "tensorflow"
+  ],
+  "author": "Crop Disease Prediction System Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "devDependencies": {
+    "vercel": "^32.0.0"
+  }
+}

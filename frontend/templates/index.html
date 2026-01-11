@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="{{ get_locale() }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="description" content="{{ _('AI-Powered Agricultural Disease Detection') }}">
+    <meta name="keywords" content="crop disease, plant health, AI detection, agriculture">
+    <meta name="author" content="Crop Disease Prediction System">
+
+    <!-- PWA Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Crop Disease Detector">
+    <meta name="msapplication-TileColor" content="#2563eb">
+    <meta name="msapplication-config" content="/static/manifest.json">
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/icons/apple-touch-icon.png">
+    <link rel="manifest" href="/static/manifest.json">
+
+    <title>{{ _('Crop Disease Prediction System') }}</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom CSS -->
+    <style>
+        .upload-area {
+            border: 2px dashed #cbd5e0;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        }
+        .upload-area:hover {
+            border-color: #3b82f6;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.1);
+        }
+        .upload-area.dragover {
+            border-color: #2563eb;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            transform: scale(1.02);
+        }
+        .upload-area.uploading {
+            border-color: #f59e0b;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        }
+
+        .progress-bar {
+            transition: width 0.3s ease;
+        }
+
+        .camera-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+        }
+
+        .camera-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .camera-container:hover .camera-overlay {
+            opacity: 1;
+        }
+
+        .result-card {
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .pulse-animation {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .5;
+            }
+        }
+
+        .toast {
+            animation: toastSlideIn 0.3s ease-out;
+        }
+
+        @keyframes toastSlideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .offline-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #dc2626;
+            color: white;
+            text-align: center;
+            padding: 8px;
+            z-index: 1000;
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .offline-indicator.show {
+            transform: translateY(0);
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            .upload-area {
+                background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+                border-color: #475569;
+            }
+            .upload-area:hover {
+                background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            }
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #2563eb;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Camera shutter animation */
+        .shutter {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white;
+            opacity: 0;
+            animation: shutter 0.3s ease-in-out;
+        }
+
+        @keyframes shutter {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen font-sans">
+    <!-- Offline Indicator -->
+    <div id="offline-indicator" class="offline-indicator">
+        <div class="flex items-center justify-center">
+            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 000 16zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+            </svg>
+            You're offline. Some features may not be available.
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <!-- Install PWA Prompt -->
+    <div id="install-prompt" class="fixed bottom-4 left-4 right-4 bg-white rounded-lg shadow-lg p-4 hidden md:left-auto md:right-4 md:w-96">
+        <div class="flex items-start justify-between">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <svg class="w-8 h-8 text-blue-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v11a3 3 0 106 0V4a2 2 0 00-2-2H4zm1 14a1 1 0 100-2 1 1 0 000 2zm5-1.757l4.9-4.9a2 2 0 000-2.828L13.485 5.1a2 2 0 00-2.828 0L10 5.757v8.486zM16 18H9.071l6-6H16a2 2 0 012 2v2a2 2 0 01-2 2z" clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-gray-900">Install Crop Disease Detector</h3>
+                    <p class="text-sm text-gray-500 mt-1">Get the full experience with offline access and camera features.</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button id="install-dismiss" class="text-gray-400 hover:text-gray-600 text-sm">Not now</button>
+                <button id="install-accept" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">Install</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 py-6 max-w-6xl">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <div class="flex items-center justify-center mb-4">
+                <svg class="w-12 h-12 text-green-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v11a3 3 0 106 0V4a2 2 0 00-2-2H4zm1 14a1 1 0 100-2 1 1 0 000 2zm5-1.757l4.9-4.9a2 2 0 000-2.828L13.485 5.1a2 2 0 00-2.828 0L10 5.757v8.486zM16 18H9.071l6-6H16a2 2 0 012 2v2a2 2 0 01-2 2z" clip-rule="evenodd"></path>
+                </svg>
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-800">{{ _('Crop Disease Prediction System') }}</h1>
+            </div>
+            <p class="text-gray-600 text-lg">{{ _('AI-Powered Agricultural Disease Detection') }}</p>
+            <div class="mt-4 flex items-center justify-center space-x-4 text-sm text-gray-500">
+                <span class="flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    Real-time Analysis
+                </span>
+                <span class="flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path>
+                    </svg>
+                    95% Accuracy
+                </span>
+                <span class="flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0 1 1 0 012 0zm-1 4a1 1 0 00-1 1v4a1 1 0 102 0V9a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                    </svg>
+                    Offline Ready
+                </span>
+            </div>
+
+            <!-- Language Selector -->
+            <div class="mt-4 flex items-center justify-center space-x-2">
+                <span class="text-sm text-gray-600">{{ _('Language') }}:</span>
+                <a href="/lang/en" class="px-3 py-1 text-sm rounded-md {{ 'bg-blue-600 text-white' if get_locale() == 'en' else 'bg-gray-200 text-gray-700 hover:bg-gray-300' }} transition-colors">{{ _('English') }}</a>
+                <a href="/lang/hi" class="px-3 py-1 text-sm rounded-md {{ 'bg-blue-600 text-white' if get_locale() == 'hi' else 'bg-gray-200 text-gray-700 hover:bg-gray-300' }} transition-colors">{{ _('Hindi') }}</a>
+            </div>
+        </header>
+
+        <main class="space-y-6">
+            <!-- Input Methods Tabs -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="border-b border-gray-200">
+                    <nav class="flex">
+                        <button id="upload-tab" class="tab-button active px-6 py-4 text-sm font-medium text-blue-600 border-b-2 border-blue-600 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                            {{ _('Upload Image') }}
+                        </button>
+                        <button id="camera-tab" class="tab-button px-6 py-4 text-sm font-medium text-gray-500 hover:text-gray-700 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            Camera
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Upload Section -->
+                <div id="upload-section" class="p-6">
+                    <div id="upload-area" class="upload-area p-8 text-center cursor-pointer">
+                        <div id="upload-content">
+                            <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                            </svg>
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">{{ _('Upload a leaf image to detect diseases and get treatment recommendations') }}</h3>
+                            <p class="text-gray-600 mb-4">{{ _('Click to browse or drag and drop') }}</p>
+                            <p class="text-sm text-gray-500">PNG, JPG, JPEG up to 16MB</p>
+                            <div class="mt-4">
+                                <input type="file" id="image-input" accept="image/*" class="hidden">
+                                <button class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors inline-flex items-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                    </svg>
+                                    {{ _('Choose Image') }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Upload Progress -->
+                        <div id="upload-progress" class="hidden">
+                            <div class="mb-4">
+                                <div class="bg-gray-200 rounded-full h-2">
+                                    <div id="progress-bar" class="bg-blue-600 h-2 rounded-full progress-bar" style="width: 0%"></div>
+                                </div>
+                                <p class="text-sm text-gray-600 mt-2" id="progress-text">Uploading...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Image Preview -->
+                    <div id="preview-section" class="mt-6 hidden">
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <h4 class="text-lg font-medium mb-4">Image Preview</h4>
+                            <div class="flex flex-col md:flex-row items-start space-y-4 md:space-y-0 md:space-x-6">
+                                <div class="flex-1">
+                                    <img id="image-preview" class="max-w-full h-auto rounded-lg shadow-md mx-auto">
+                                </div>
+                                <div class="flex-1 space-y-4">
+                                    <div class="bg-white p-4 rounded-lg border">
+                                        <h5 class="font-medium mb-2">Image Info</h5>
+                                        <div class="text-sm text-gray-600 space-y-1">
+                                            <p id="image-size">Size: Calculating...</p>
+                                            <p id="image-format">Format: Detecting...</p>
+                                            <p id="image-dimensions">Dimensions: Analyzing...</p>
+                                        </div>
+                                    </div>
+                                    <button id="analyze-btn" class="w-full bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors inline-flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed">
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                        </svg>
+                                        Analyze Disease
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Camera Section -->
+                <div id="camera-section" class="p-6 hidden">
+                    <div class="text-center">
+                        <h3 class="text-lg font-medium mb-4">Capture Leaf Image</h3>
+                        <div class="max-w-2xl mx-auto">
+                            <div class="camera-container bg-black rounded-lg overflow-hidden mb-4">
+                                <video id="camera-feed" class="w-full h-64 md:h-96 object-cover" autoplay playsinline muted></video>
+                                <div class="camera-overlay">
+                                    <button id="capture-btn" class="bg-white text-black px-6 py-3 rounded-full hover:bg-gray-200 transition-colors inline-flex items-center">
+                                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        </svg>
+                                        Capture
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="flex justify-center space-x-4">
+                                <button id="camera-toggle" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                                    Start Camera
+                                </button>
+                                <button id="switch-camera" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors hidden">
+                                    Switch Camera
+                                </button>
+                            </div>
+                            <canvas id="capture-canvas" class="hidden"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analysis Progress -->
+            <div id="analysis-progress" class="bg-white rounded-xl shadow-lg p-6 hidden">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-medium">Analyzing Image</h3>
+                    <span id="progress-percentage" class="text-sm text-gray-500">0%</span>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex items-center">
+                        <div class="flex-1 bg-gray-200 rounded-full h-2 mr-3">
+                            <div id="analysis-progress-bar" class="bg-blue-600 h-2 rounded-full progress-bar transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                        <span class="text-sm text-gray-600 w-20" id="current-step">Initializing</span>
+                    </div>
+                    <div class="text-sm text-gray-500" id="progress-description">Preparing image for analysis...</div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div id="results-section" class="bg-white rounded-xl shadow-lg p-6 hidden result-card">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-semibold flex items-center">
+                        <svg class="w-6 h-6 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        {{ _('Results') }}
+                    </h2>
+                    <div class="flex space-x-2">
+                        <button id="share-results" class="text-gray-400 hover:text-gray-600 p-2 rounded-lg hover:bg-gray-100">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
+                            </svg>
+                        </button>
+                        <button id="download-report" class="text-gray-400 hover:text-gray-600 p-2 rounded-lg hover:bg-gray-100">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="results-content">
+                    <!-- Results will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Questions Section -->
+            <div id="questions-section" class="bg-white rounded-xl shadow-lg p-6 hidden result-card">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-semibold flex items-center">
+                        <svg class="w-6 h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Follow-up Questions
+                    </h2>
+                    <span class="text-sm text-gray-500">Help improve accuracy</span>
+                </div>
+
+                <div id="questions-content">
+                    <!-- Questions will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- History Section -->
+            <div id="history-section" class="bg-white rounded-xl shadow-lg p-6 hidden">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-semibold flex items-center">
+                        <svg class="w-6 h-6 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Recent Analyses
+                    </h2>
+                    <button id="refresh-history" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                        Refresh
+                    </button>
+                </div>
+
+                <div id="history-content" class="space-y-4">
+                    <!-- History will be populated by JavaScript -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="mt-12 text-center text-gray-500 text-sm">
+            <p>&copy; 2026 Crop Disease Prediction System. Powered by AI for sustainable agriculture.</p>
+            <div class="mt-2 flex items-center justify-center space-x-4">
+                <a href="#" class="hover:text-gray-700">Privacy Policy</a>
+                <a href="#" class="hover:text-gray-700">Terms of Service</a>
+                <a href="#" class="hover:text-gray-700">Support</a>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Service Worker Registration -->
+    <script src="/static/js/pwa.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

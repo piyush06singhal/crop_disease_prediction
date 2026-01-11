@@ -1,0 +1,133 @@
+# Hindi translations for Crop Disease Prediction System
+# messages.po - Translation file for Hindi (hi)
+
+msgid ""
+msgstr ""
+"Language: hi\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+# Navigation and UI
+msgid "Home"
+msgstr "होम"
+
+msgid "Upload Image"
+msgstr "छवि अपलोड करें"
+
+msgid "Analytics"
+msgstr "विश्लेषण"
+
+msgid "About"
+msgstr "हमारे बारे में"
+
+msgid "Language"
+msgstr "भाषा"
+
+msgid "English"
+msgstr "अंग्रेजी"
+
+msgid "Hindi"
+msgstr "हिंदी"
+
+# Main page
+msgid "Crop Disease Prediction System"
+msgstr "फसल रोग भविष्यवाणी प्रणाली"
+
+msgid "AI-Powered Agricultural Disease Detection"
+msgstr "एआई-संचालित कृषि रोग का पता लगाना"
+
+msgid "Upload a leaf image to detect diseases and get treatment recommendations"
+msgstr "रोग का पता लगाने और उपचार सिफारिशें प्राप्त करने के लिए पत्ती की छवि अपलोड करें"
+
+msgid "Choose Image"
+msgstr "छवि चुनें"
+
+msgid "Upload"
+msgstr "अपलोड"
+
+msgid "Processing..."
+msgstr "प्रोसेसिंग..."
+
+msgid "Results"
+msgstr "परिणाम"
+
+msgid "Disease Detected"
+msgstr "रोग का पता चला"
+
+msgid "Confidence"
+msgstr "विश्वास"
+
+msgid "Treatment Recommendations"
+msgstr "उपचार सिफारिशें"
+
+msgid "Prevention Tips"
+msgstr "रोकथाम सुझाव"
+
+msgid "Similar Cases"
+msgstr "समान मामले"
+
+# Disease names (common crop diseases)
+msgid "Bacterial Blight"
+msgstr "बैक्टीरियल ब्लाइट"
+
+msgid "Fungal Infection"
+msgstr "फंगल संक्रमण"
+
+msgid "Viral Disease"
+msgstr "वायरल रोग"
+
+msgid "Nutrient Deficiency"
+msgstr "पोषक तत्व की कमी"
+
+msgid "Pest Damage"
+msgstr "कीट नुकसान"
+
+msgid "Healthy"
+msgstr "स्वस्थ"
+
+# Error messages
+msgid "No file uploaded"
+msgstr "कोई फाइल अपलोड नहीं हुई"
+
+msgid "Invalid file type. Please upload an image."
+msgstr "अमान्य फाइल प्रकार। कृपया एक छवि अपलोड करें।"
+
+msgid "File too large. Maximum size is 16MB."
+msgstr "फाइल बहुत बड़ी है। अधिकतम आकार 16MB है।"
+
+msgid "Error processing image"
+msgstr "छवि प्रोसेस करने में त्रुटि"
+
+msgid "Unable to analyze image"
+msgstr "छवि का विश्लेषण करने में असमर्थ"
+
+# Analytics
+msgid "Dashboard"
+msgstr "डैशबोर्ड"
+
+msgid "Total Predictions"
+msgstr "कुल भविष्यवाणियाँ"
+
+msgid "Active Users"
+msgstr "सक्रिय उपयोगकर्ता"
+
+msgid "Model Accuracy"
+msgstr "मॉडल सटीकता"
+
+msgid "System Health"
+msgstr "सिस्टम स्वास्थ्य"
+
+msgid "Recent Activity"
+msgstr "हाल की गतिविधि"
+
+# Footer
+msgid "© 2024 Crop Disease Prediction System. All rights reserved."
+msgstr "© 2024 फसल रोग भविष्यवाणी प्रणाली। सभी अधिकार सुरक्षित।"
+
+msgid "Privacy Policy"
+msgstr "गोपनीयता नीति"
+
+msgid "Terms of Service"
+msgstr "सेवा की शर्तें"
+
+msgid "Contact Us"
+msgstr "हमसे संपर्क करें"

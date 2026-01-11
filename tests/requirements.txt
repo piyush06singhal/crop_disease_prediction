@@ -1,0 +1,36 @@
+# tests/requirements.txt - Test dependencies
+# Testing framework
+pytest>=7.0.0
+pytest-cov>=4.0.0
+pytest-html>=3.1.0
+pytest-xdist>=3.0.0
+
+# Web testing
+selenium>=4.0.0
+webdriver-manager>=4.0.0
+
+# Mocking and fixtures
+responses>=0.23.0
+freezegun>=1.2.0
+
+# API testing
+requests>=2.28.0
+httpx>=0.24.0
+
+# Image processing for tests
+Pillow>=9.0.0
+
+# Data validation
+jsonschema>=4.17.0
+
+# Performance testing
+locust>=2.15.0
+
+# Code quality
+flake8>=6.0.0
+black>=23.0.0
+mypy>=1.0.0
+
+# Test utilities
+faker>=18.0.0
+factory-boy>=3.2.0

@@ -1,0 +1,24 @@
+# api/requirements.txt - Vercel Deployment Dependencies
+# Core Flask framework
+Flask==2.3.3
+Flask-CORS==4.0.0
+Werkzeug==2.3.7
+
+# ML and Image Processing (lightweight versions for serverless)
+tensorflow-cpu==2.15.0
+Pillow==10.0.0
+opencv-python-headless==4.8.0.76
+numpy==1.24.3
+
+# LLM Integration
+google-generativeai==0.2.2
+requests==2.31.0
+
+# Data Processing
+pandas==2.0.3
+
+# Configuration
+python-dotenv==1.0.0
+
+# Additional utilities
+gunicorn==21.2.0

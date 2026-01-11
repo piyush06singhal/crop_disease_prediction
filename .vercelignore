@@ -1,0 +1,54 @@
+# .vercelignore - Files to exclude from Vercel deployment
+
+# Development and testing
+.pytest_cache/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+tests/
+training/
+reports/
+analytics/test_analytics.py
+analytics/simple_test.py
+
+# Documentation
+*.md
+!README.md
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Large model files (will be handled separately)
+backend/models/*.h5
+backend/models/*.tflite
+training/models/
+
+# Cache directories
+backend/sessions/
+backend/instance/
+
+# Development databases
+*.db
+*.sqlite
+*.sqlite3

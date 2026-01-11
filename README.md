@@ -1,103 +1,179 @@
 # Crop Disease Prediction System
 
-An advanced, production-ready AI-powered web application for detecting crop diseases from leaf images using deep learning and LLM-driven diagnostic reasoning.
+AI-powered web application for detecting crop diseases from leaf images using deep learning and LLM-driven diagnostic reasoning.
 
 ## 🌟 Features
 
 ### Core Features
-- **AI-Powered Disease Detection**: Uses transfer learning with MobileNetV2/EfficientNetB0 for 38+ disease classes
-- **Progressive Confidence System**: Intelligent confidence refinement through follow-up questioning
-- **LLM Integration**: Google Gemini API with rule-based fallback for intelligent diagnostic questions
+- **AI Disease Detection**: Transfer learning with MobileNetV2/EfficientNetB0 for 38+ disease classes
+- **Progressive Confidence**: Intelligent confidence refinement through follow-up questioning
+- **LLM Integration**: Google Gemini API with rule-based fallback for diagnostic questions
 - **Explainable AI**: Grad-CAM heatmaps showing infected regions
 - **Multi-Crop Support**: Tomato, potato, corn, pepper, apple, grape, and more
 - **Mobile-First UI**: Responsive design with drag-and-drop upload
-- **Production Ready**: Modular architecture, comprehensive error handling, and scalable design
 
-### Phase 3 Advanced Features ✨
+### Advanced Features ✨
+- **🌐 Multi-Language**: Hindi + English support with Flask-Babel
+- **📱 PWA**: Offline capability, installable app, background sync
+- **🩺 Treatment Recommendations**: Comprehensive treatment database with LLM-enhanced advice
+- **🔌 Offline Inference**: Browser-based TensorFlow Lite models
+- **🧠 Continual Learning**: Background model retraining with user feedback
+- **📊 Analytics Dashboard**: Real-time metrics and performance monitoring
 
-#### 🌐 Multi-Language Support (Hindi + English)
-- **Flask-Babel Integration**: Complete internationalization support
-- **Dynamic Language Switching**: Real-time language switching without page reload
-- **Translated UI Elements**: All interface elements translated to Hindi
-- **Disease Name Translations**: Agricultural terms and disease names in both languages
-- **LLM Response Translation**: AI-generated responses available in Hindi
+## 🏗️ Tech Stack
 
-#### 📱 Progressive Web App (PWA)
-- **Offline Capability**: Service worker caching for offline functionality
-- **Installable App**: Add to home screen on mobile devices
-- **Background Sync**: Sync offline predictions when back online
-- **Push Notifications**: Disease alerts and system updates
-- **App-like Experience**: Native app feel with web technologies
-
-#### 🩺 Treatment Recommendations
-- **Comprehensive Treatment Database**: 6 major disease categories with detailed treatments
-- **LLM-Enhanced Recommendations**: AI-generated treatment advice based on predictions
-- **Multi-Modal Treatments**: Chemical, biological, and cultural control methods
-- **Prevention Strategies**: Proactive measures and best practices
-- **Agricultural Integration**: Integration with agricultural knowledge bases
-
-#### 🔌 Offline Inference
-- **TensorFlow Lite Models**: Optimized models for edge computing
-- **Browser-Based Inference**: Run predictions directly in the browser
-- **Model Caching**: Automatic model downloading and caching
-- **Fallback Mechanisms**: Graceful degradation when offline
-- **Performance Optimization**: Quantized models for faster inference
-
-#### 🧠 Continual Learning
-- **Background Retraining**: Automatic model improvement with user feedback
-- **Data Quality Validation**: Intelligent filtering of training samples
-- **Model Versioning**: Track and rollback to previous model versions
-- **Performance Monitoring**: Automated evaluation of model improvements
-- **Incremental Learning**: Fine-tuning without full retraining
-
-#### 📊 Advanced Analytics Dashboard
-- **Real-time Metrics**: Live system performance monitoring
-- **User Behavior Analytics**: Track user interactions and patterns
-- **Model Performance Tracking**: Accuracy trends and prediction statistics
-- **System Health Monitoring**: CPU, memory, and API response times
-- **Interactive Charts**: Chart.js powered visualizations
-
-## 🏗️ Architecture
-
-### System Layers
-1. **Frontend Layer**: HTML5/CSS3 + JavaScript (ES6+) with PWA capabilities
-2. **API Gateway**: Flask REST API with input validation and rate limiting
-3. **Image Processing Layer**: OpenCV/Pillow preprocessing pipeline
-4. **ML Inference Layer**: TensorFlow/TensorFlow Lite optimized inference
-5. **Offline Inference Engine**: Browser-based TensorFlow Lite inference
-6. **Confidence Engine**: Weighted confidence calculation with progressive refinement
-7. **LLM Reasoning Engine**: Intelligent question generation and treatment recommendations
-8. **Continual Learning Pipeline**: Background model retraining and versioning
-9. **Session Management**: Redis-backed session storage
-10. **Logging & Monitoring**: Structured logging with health checks and analytics
-
-### Tech Stack
-- **Backend**: Python 3.12+, Flask, TensorFlow, Redis, Celery
+- **Backend**: Python 3.12+, Flask, TensorFlow 2.20.0, Redis, Celery
 - **Frontend**: HTML5, Tailwind CSS, Vanilla JavaScript, Service Workers
-- **AI/ML**: Transfer Learning (MobileNetV2/EfficientNetB0), TensorFlow Lite, Optuna
-- **LLM**: Google Gemini API with Ollama fallback
-- **Internationalization**: Flask-Babel for multi-language support
+- **AI/ML**: Transfer Learning, TensorFlow Lite, Google Gemini API
 - **Database**: SQLite (dev) → PostgreSQL (production)
-- **Deployment**: Vercel serverless functions with Docker support
+- **Deployment**: Vercel, Docker, Streamlit
 
-## 🏗️ Architecture
+## 🚀 Quick Start
 
-### System Layers
-1. **Frontend Layer**: HTML5/CSS3 + JavaScript (ES6+)
-2. **API Gateway**: Flask REST API with input validation
-3. **Image Processing Layer**: OpenCV/Pillow preprocessing pipeline
-4. **ML Inference Layer**: TensorFlow/TensorFlow Lite optimized inference
-5. **Confidence Engine**: Weighted confidence calculation with progressive refinement
-6. **LLM Reasoning Engine**: Intelligent question generation and answer analysis
-7. **Session Management**: Redis-backed session storage
-8. **Logging & Monitoring**: Structured logging with health checks
+### Prerequisites
+- Python 3.12+
+- Node.js 14+ (for Vercel deployment)
+- Google Gemini API key
 
-### Tech Stack
-- **Backend**: Python 3.12+, Flask, TensorFlow, Redis
-- **Frontend**: HTML5, Tailwind CSS, Vanilla JavaScript
-- **AI/ML**: Transfer Learning (MobileNetV2/EfficientNetB0), TensorFlow Lite
-- **LLM**: Google Gemini API with Ollama fallback
-- **Database**: SQLite (dev) → PostgreSQL (production)
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/piyush06singhal/crop_disease_prediction.git
+   cd crop-disease-prediction
+   ```
+
+2. **Install Python dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Set up environment variables**
+   ```bash
+   cp .env.example .env  # Create from template
+   # Edit .env with your API keys
+   ```
+
+4. **Run the application**
+   ```bash
+   # Development
+   python backend/app.py
+
+   # With Gunicorn (production)
+   gunicorn -w 4 -b 0.0.0.0:5000 backend.app:create_app()
+   ```
+
+## 📋 API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/health` | System health check |
+| GET | `/crops` | Supported crop types |
+| POST | `/predict` | Disease prediction from image |
+| POST | `/answer` | Submit answer to follow-up question |
+| GET | `/explain/<id>` | Get prediction explanation |
+| GET | `/treatment/<disease>` | Get treatment recommendations |
+| GET | `/lang/<code>` | Switch language (en/hi) |
+| GET | `/offline/status` | Check offline inference status |
+
+## 🧪 Testing
+
+```bash
+# Run all tests
+python tests/run_tests.py all
+
+# Run unit tests only
+python tests/run_tests.py unit
+
+# Run API tests
+python tests/run_tests.py api
+```
+
+## 🚢 Deployment
+
+### Vercel (Recommended)
+```bash
+# Install Vercel CLI
+npm install -g vercel
+
+# Deploy
+npm run vercel-deploy
+```
+
+### Docker
+```bash
+# Build and run
+docker-compose up --build
+```
+
+### Streamlit (Alternative)
+```bash
+streamlit run streamlit_app.py
+```
+
+## 🔧 Environment Variables
+
+Create a `.env` file with:
+
+```bash
+# Flask
+SECRET_KEY=your-secret-key
+FLASK_ENV=development
+
+# APIs
+GEMINI_API_KEY=your-gemini-api-key
+OLLAMA_BASE_URL=http://localhost:11434
+
+# Database
+DATABASE_URL=sqlite:///crop_disease.db
+
+# Redis
+REDIS_URL=redis://localhost:6379/0
+```
+
+## 📊 Project Structure
+
+```
+crop-disease-prediction/
+├── backend/                 # Flask application
+│   ├── app.py              # Main application
+│   ├── config.py           # Configuration
+│   ├── routes/             # API endpoints
+│   ├── services/           # Business logic
+│   ├── models/             # ML models
+│   └── utils/              # Utilities
+├── frontend/               # Web interface
+│   ├── templates/          # HTML templates
+│   └── static/             # CSS/JS assets
+├── tests/                  # Test suite
+├── analytics/              # Analytics dashboard
+├── training/               # ML training notebooks
+├── api/                    # Vercel deployment
+└── requirements.txt        # Python dependencies
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- PlantVillage dataset for training data
+- TensorFlow team for ML framework
+- Google for Gemini API
+- Flask community for web framework
+
+---
+
+**Built with ❤️ for farmers worldwide** 🌾
 
 ## 🚀 Quick Start
 
